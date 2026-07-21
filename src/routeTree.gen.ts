@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RepertorioRouteImport } from './routes/repertorio'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as EscalaRouteImport } from './routes/escala'
+import { Route as CultoRouteImport } from './routes/culto'
 import { Route as IndexRouteImport } from './routes/index'
 
+const RepertorioRoute = RepertorioRouteImport.update({
+  id: '/repertorio',
+  path: '/repertorio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscalaRoute = EscalaRouteImport.update({
+  id: '/escala',
+  path: '/escala',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CultoRoute = CultoRouteImport.update({
+  id: '/culto',
+  path: '/culto',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,72 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/culto': typeof CultoRoute
+  '/escala': typeof EscalaRoute
+  '/perfil': typeof PerfilRoute
+  '/repertorio': typeof RepertorioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/culto': typeof CultoRoute
+  '/escala': typeof EscalaRoute
+  '/perfil': typeof PerfilRoute
+  '/repertorio': typeof RepertorioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/culto': typeof CultoRoute
+  '/escala': typeof EscalaRoute
+  '/perfil': typeof PerfilRoute
+  '/repertorio': typeof RepertorioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
+  id: '__root__' | '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CultoRoute: typeof CultoRoute
+  EscalaRoute: typeof EscalaRoute
+  PerfilRoute: typeof PerfilRoute
+  RepertorioRoute: typeof RepertorioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/repertorio': {
+      id: '/repertorio'
+      path: '/repertorio'
+      fullPath: '/repertorio'
+      preLoaderRoute: typeof RepertorioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escala': {
+      id: '/escala'
+      path: '/escala'
+      fullPath: '/escala'
+      preLoaderRoute: typeof EscalaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/culto': {
+      id: '/culto'
+      path: '/culto'
+      fullPath: '/culto'
+      preLoaderRoute: typeof CultoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +121,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CultoRoute: CultoRoute,
+  EscalaRoute: EscalaRoute,
+  PerfilRoute: PerfilRoute,
+  RepertorioRoute: RepertorioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

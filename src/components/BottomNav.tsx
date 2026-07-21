@@ -1,13 +1,20 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, CalendarDays, Music2, User, Play } from "lucide-react";
 
-const items = [
+type NavItem = {
+  to: "/" | "/escala" | "/culto" | "/repertorio" | "/perfil";
+  label: string;
+  icon: typeof Home;
+  center?: boolean;
+};
+
+const items: NavItem[] = [
   { to: "/", label: "Início", icon: Home },
   { to: "/escala", label: "Escala", icon: CalendarDays },
   { to: "/culto", label: "Culto", icon: Play, center: true },
   { to: "/repertorio", label: "Músicas", icon: Music2 },
   { to: "/perfil", label: "Perfil", icon: User },
-] as const;
+];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
