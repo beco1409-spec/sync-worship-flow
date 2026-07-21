@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AppShell, AppHeader } from "@/components/AppShell";
 import { cultosFuturos, statusColor, statusLabel, type Status } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/escala")({
+export const Route = createFileRoute("/_authenticated/escala")({
   head: () => ({
     meta: [
       { title: "Escala — Portal Adoração" },

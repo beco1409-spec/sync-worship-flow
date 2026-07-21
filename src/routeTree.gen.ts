@@ -9,106 +9,84 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RepertorioRouteImport } from './routes/repertorio'
-import { Route as PerfilRouteImport } from './routes/perfil'
-import { Route as EscalaRouteImport } from './routes/escala'
-import { Route as CultoRouteImport } from './routes/culto'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRepertorioRouteImport } from './routes/_authenticated/repertorio'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedEscalaRouteImport } from './routes/_authenticated/escala'
+import { Route as AuthenticatedCultoRouteImport } from './routes/_authenticated/culto'
 
-const RepertorioRoute = RepertorioRouteImport.update({
-  id: '/repertorio',
-  path: '/repertorio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilRoute = PerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EscalaRoute = EscalaRouteImport.update({
-  id: '/escala',
-  path: '/escala',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CultoRoute = CultoRouteImport.update({
-  id: '/culto',
-  path: '/culto',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRepertorioRoute = AuthenticatedRepertorioRouteImport.update({
+  id: '/_authenticated/repertorio',
+  path: '/repertorio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/_authenticated/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedEscalaRoute = AuthenticatedEscalaRouteImport.update({
+  id: '/_authenticated/escala',
+  path: '/escala',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCultoRoute = AuthenticatedCultoRouteImport.update({
+  id: '/_authenticated/culto',
+  path: '/culto',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/culto': typeof CultoRoute
-  '/escala': typeof EscalaRoute
-  '/perfil': typeof PerfilRoute
-  '/repertorio': typeof RepertorioRoute
+  '/culto': typeof AuthenticatedCultoRoute
+  '/escala': typeof AuthenticatedEscalaRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/repertorio': typeof AuthenticatedRepertorioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/culto': typeof CultoRoute
-  '/escala': typeof EscalaRoute
-  '/perfil': typeof PerfilRoute
-  '/repertorio': typeof RepertorioRoute
+  '/culto': typeof AuthenticatedCultoRoute
+  '/escala': typeof AuthenticatedEscalaRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/repertorio': typeof AuthenticatedRepertorioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/culto': typeof CultoRoute
-  '/escala': typeof EscalaRoute
-  '/perfil': typeof PerfilRoute
-  '/repertorio': typeof RepertorioRoute
+  '/_authenticated/culto': typeof AuthenticatedCultoRoute
+  '/_authenticated/escala': typeof AuthenticatedEscalaRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/repertorio': typeof AuthenticatedRepertorioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
-  id: '__root__' | '/' | '/culto' | '/escala' | '/perfil' | '/repertorio'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated/culto'
+    | '/_authenticated/escala'
+    | '/_authenticated/perfil'
+    | '/_authenticated/repertorio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CultoRoute: typeof CultoRoute
-  EscalaRoute: typeof EscalaRoute
-  PerfilRoute: typeof PerfilRoute
-  RepertorioRoute: typeof RepertorioRoute
+  AuthenticatedCultoRoute: typeof AuthenticatedCultoRoute
+  AuthenticatedEscalaRoute: typeof AuthenticatedEscalaRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedRepertorioRoute: typeof AuthenticatedRepertorioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/repertorio': {
-      id: '/repertorio'
-      path: '/repertorio'
-      fullPath: '/repertorio'
-      preLoaderRoute: typeof RepertorioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfil': {
-      id: '/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof PerfilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/escala': {
-      id: '/escala'
-      path: '/escala'
-      fullPath: '/escala'
-      preLoaderRoute: typeof EscalaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/culto': {
-      id: '/culto'
-      path: '/culto'
-      fullPath: '/culto'
-      preLoaderRoute: typeof CultoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -116,15 +94,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/repertorio': {
+      id: '/_authenticated/repertorio'
+      path: '/repertorio'
+      fullPath: '/repertorio'
+      preLoaderRoute: typeof AuthenticatedRepertorioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/escala': {
+      id: '/_authenticated/escala'
+      path: '/escala'
+      fullPath: '/escala'
+      preLoaderRoute: typeof AuthenticatedEscalaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/culto': {
+      id: '/_authenticated/culto'
+      path: '/culto'
+      fullPath: '/culto'
+      preLoaderRoute: typeof AuthenticatedCultoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CultoRoute: CultoRoute,
-  EscalaRoute: EscalaRoute,
-  PerfilRoute: PerfilRoute,
-  RepertorioRoute: RepertorioRoute,
+  AuthenticatedCultoRoute: AuthenticatedCultoRoute,
+  AuthenticatedEscalaRoute: AuthenticatedEscalaRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedRepertorioRoute: AuthenticatedRepertorioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

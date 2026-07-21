@@ -13,7 +13,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { proximoCulto } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/culto")({
+export const Route = createFileRoute("/_authenticated/culto")({
   head: () => ({
     meta: [
       { title: "Modo Culto Ao Vivo — Portal Adoração" },

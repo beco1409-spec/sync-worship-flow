@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Bell, Music2, Settings, LogOut, ChevronRight, Star } from "lucide-react";
 import { AppShell, AppHeader } from "@/components/AppShell";
 
-export const Route = createFileRoute("/perfil")({
+export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
       { title: "Perfil — Portal Adoração" },

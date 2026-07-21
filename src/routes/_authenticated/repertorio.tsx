@@ -4,7 +4,7 @@ import { Search, Music2, Clock, GripVertical } from "lucide-react";
 import { AppShell, AppHeader } from "@/components/AppShell";
 import { proximoCulto, bibliotecaMusicas } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/repertorio")({
+export const Route = createFileRoute("/_authenticated/repertorio")({
   head: () => ({
     meta: [
       { title: "Repertório — Portal Adoração" },
