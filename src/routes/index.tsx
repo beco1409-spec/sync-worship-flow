@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Play, FileText, MessageCircle, ChevronRight, Clock, MapPin } from "lucide-react";
+import { Play, FileText, MessageCircle, ChevronRight, Clock, MapPin, LogIn } from "lucide-react";
 import { AppShell, AppHeader } from "@/components/AppShell";
+import { useAuth } from "@/hooks/use-auth";
 import {
   proximoCulto,
   avisos,
   agendaSemana,
-  statusColor,
 } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
