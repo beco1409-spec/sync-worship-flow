@@ -40,18 +40,38 @@ function Countdown() {
 }
 
 function Dashboard() {
+  const { user } = useAuth();
   const confirmados = proximoCulto.integrantes.filter((i) => i.status === "confirmado");
   const pendentes = proximoCulto.integrantes.filter((i) => i.status === "pendente");
+
+  const iniciais = ((user?.user_metadata?.full_name as string) || user?.email || "GA")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s: string) => s[0]?.toUpperCase())
+    .join("");
 
   return (
     <AppShell>
       <AppHeader
-        eyebrow="Shalom, Gabriel"
+        eyebrow={user ? "Shalom" : "Bem-vindo"}
         title="Adoração & Vida"
         right={
-          <div className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground font-semibold ring-2 ring-accent/20">
-            GA
-          </div>
+          user ? (
+            <Link
+              to="/perfil"
+              className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground font-semibold ring-2 ring-accent/20"
+            >
+              {iniciais}
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              <LogIn className="size-3.5" /> Entrar
+            </Link>
+          )
         }
       />
 
