@@ -1,170 +1,105 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, Clock, MapPin, User, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Plus, Calendar, ChevronRight, MapPin, Clock } from "lucide-react";
 import { AppShell, AppHeader } from "@/components/AppShell";
-import { cultosFuturos, statusColor, statusLabel, type Status } from "@/lib/mock-data";
+import { listCultos, formatCultoData, formatHora } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/escala")({
   head: () => ({
     meta: [
       { title: "Escala — Portal Adoração" },
-      { name: "description", content: "Escala dos cultos: integrantes confirmados, pendentes, funções e substituições." },
+      {
+        name: "description",
+        content: "Gerencie a escala dos cultos: crie, edite e organize sua equipe.",
+      },
     ],
   }),
-  component: EscalaPage,
+  component: EscalaLayout,
 });
 
-function EscalaPage() {
-  const [selectedId, setSelectedId] = useState(cultosFuturos[0].id);
-  const culto = cultosFuturos.find((c) => c.id === selectedId) ?? cultosFuturos[0];
+function EscalaLayout() {
+  const matchRoute = useMatchRoute();
+  const emDetalhe = matchRoute({ to: "/escala/$cultoId", fuzzy: true });
+  const emNovo = matchRoute({ to: "/escala/novo" });
+  if (emDetalhe || emNovo) return <Outlet />;
+  return <EscalaLista />;
+}
 
-  const grupos: Record<string, typeof culto.integrantes> = {};
-  for (const i of culto.integrantes) {
-    (grupos[i.funcao] ??= []).push(i);
-  }
+function EscalaLista() {
+  const { data: cultos = [], isLoading } = useQuery({
+    queryKey: ["cultos"],
+    queryFn: listCultos,
+  });
 
   return (
     <AppShell>
       <AppHeader
         eyebrow="Escala"
-        title="Cultos & Equipe"
-        subtitle="Confirme presença ou solicite substituição"
+        title="Cultos"
+        subtitle="Toque em um culto para editar, ou crie um novo"
+        right={
+          <Link
+            to="/escala/novo"
+            className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-accent-foreground shadow-glow"
+          >
+            <Plus className="size-3.5" /> Novo
+          </Link>
+        }
       />
 
-      {/* Selector de cultos */}
-      <div className="px-4 pb-4">
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-          {cultosFuturos.map((c) => {
-            const active = c.id === selectedId;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setSelectedId(c.id)}
-                className={`shrink-0 rounded-2xl border px-4 py-3 text-left transition ${
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-surface text-foreground"
-                }`}
-              >
-                <p className={`text-[10px] font-semibold uppercase tracking-wider ${active ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
-                  {c.data.split(",")[0]}
-                </p>
-                <p className="mt-0.5 font-serif text-sm">{c.nome}</p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <main className="space-y-3 px-4">
+        {isLoading && (
+          <div className="rounded-3xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
+            Carregando…
+          </div>
+        )}
 
-      <main className="space-y-4 px-4">
-        {/* Info do culto */}
-        <section className="rounded-3xl border border-border bg-surface p-5">
-          <h2 className="font-serif text-xl">{culto.nome}</h2>
-          {culto.tema && (
-            <p className="mt-1 text-sm italic text-muted-foreground">"{culto.tema}"</p>
-          )}
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
-            <Info icon={Calendar} label="Data" value={culto.data} />
-            <Info icon={Clock} label="Horário" value={culto.hora} />
-            <Info icon={MapPin} label="Local" value={culto.local} />
-            <Info icon={User} label="Pregador" value={culto.pregador} />
-          </dl>
-          <div className="mt-4 border-t border-border pt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              Responsável pela escala
+        {!isLoading && cultos.length === 0 && (
+          <div className="rounded-3xl border-2 border-dashed border-border bg-surface p-8 text-center">
+            <Calendar className="mx-auto size-8 text-muted-foreground" />
+            <p className="mt-3 font-serif text-lg italic">Nenhum culto cadastrado</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Comece criando o próximo culto do ministério.
             </p>
-            <p className="mt-1 text-sm font-medium">{culto.responsavel}</p>
+            <Link
+              to="/escala/novo"
+              className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-primary-foreground"
+            >
+              <Plus className="size-3.5" /> Criar primeiro culto
+            </Link>
           </div>
-        </section>
+        )}
 
-        {/* Status geral */}
-        <section className="grid grid-cols-3 gap-2">
-          {(["confirmado", "pendente", "recusado"] as Status[]).map((s) => {
-            const count = culto.integrantes.filter((i) => i.status === s).length;
-            return (
-              <div key={s} className="rounded-2xl border border-border bg-surface p-3 text-center">
-                <div className={`mx-auto mb-1.5 size-2 rounded-full ${statusColor(s)}`} />
-                <p className="font-serif text-xl font-bold">{count}</p>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  {statusLabel(s)}
-                </p>
+        {cultos.map((c) => (
+          <Link
+            key={c.id}
+            to="/escala/$cultoId"
+            params={{ cultoId: c.id }}
+            className="flex items-center gap-4 rounded-3xl border border-border bg-surface p-4"
+          >
+            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary/5 text-primary">
+              <Calendar className="size-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-serif text-lg leading-tight">{c.nome}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {formatCultoData(c.data)}
+              </p>
+              <div className="mt-1.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="size-3" /> {formatHora(c.hora)}
+                </span>
+                {c.local && (
+                  <span className="inline-flex items-center gap-1 truncate">
+                    <MapPin className="size-3" /> {c.local}
+                  </span>
+                )}
               </div>
-            );
-          })}
-        </section>
-
-        {/* Integrantes por função */}
-        <section className="rounded-3xl border border-border bg-surface p-5">
-          <h3 className="mb-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            Integrantes
-          </h3>
-          <div className="space-y-5">
-            {Object.entries(grupos).map(([funcao, membros]) => (
-              <div key={funcao}>
-                <p className="mb-2 font-serif text-sm italic text-muted-foreground">{funcao}</p>
-                <div className="space-y-2">
-                  {membros.map((m) => (
-                    <div
-                      key={m.id}
-                      className="flex items-center gap-3 rounded-xl bg-secondary/40 p-2.5"
-                    >
-                      <div className="grid size-9 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
-                        {m.iniciais}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{m.nome}</p>
-                        <p className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                          <span className={`size-1.5 rounded-full ${statusColor(m.status)}`} />
-                          {statusLabel(m.status)}
-                        </p>
-                      </div>
-                      <ChevronRight className="size-4 text-muted-foreground" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Ações do usuário */}
-        <section className="rounded-3xl border border-accent/25 bg-accent/5 p-5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
-            Sua presença
-          </p>
-          <p className="mt-1 text-sm text-foreground">
-            Confirme ou avise sobre indisponibilidade
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <button className="rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground">
-              Confirmar
-            </button>
-            <button className="rounded-xl border border-border bg-surface py-3 text-xs font-bold uppercase tracking-wider text-foreground">
-              Solicitar troca
-            </button>
-          </div>
-        </section>
+            </div>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+          </Link>
+        ))}
       </main>
     </AppShell>
-  );
-}
-
-function Info({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Calendar;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-xl bg-secondary/40 p-3">
-      <Icon className="mb-1.5 size-3.5 text-muted-foreground" />
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-0.5 text-xs font-medium text-foreground">{value}</p>
-    </div>
   );
 }
