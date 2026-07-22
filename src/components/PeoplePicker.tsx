@@ -28,9 +28,10 @@ export function PeoplePicker({
   const [novo, setNovo] = useState({ nome: "", extra: "" });
 
   const key = tipo === "cantor" ? ["cantores"] : ["instrumentistas"];
-  const { data = [] } = useQuery({
+  const { data = [] } = useQuery<Array<{ id: string; nome: string; voz?: string | null; instrumento?: string | null }>>({
     queryKey: key,
-    queryFn: tipo === "cantor" ? listCantores : listInstrumentistas,
+    queryFn: async () =>
+      tipo === "cantor" ? await listCantores() : await listInstrumentistas(),
   });
 
   const create = useMutation({
