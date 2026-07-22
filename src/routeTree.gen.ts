@@ -16,6 +16,8 @@ import { Route as AuthenticatedRepertorioRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedEscalaRouteImport } from './routes/_authenticated/escala'
 import { Route as AuthenticatedCultoRouteImport } from './routes/_authenticated/culto'
+import { Route as AuthenticatedEscalaNovoRouteImport } from './routes/_authenticated/escala.novo'
+import { Route as AuthenticatedEscalaCultoIdRouteImport } from './routes/_authenticated/escala.$cultoId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -51,22 +53,37 @@ const AuthenticatedCultoRoute = AuthenticatedCultoRouteImport.update({
   path: '/culto',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEscalaNovoRoute = AuthenticatedEscalaNovoRouteImport.update({
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => AuthenticatedEscalaRoute,
+} as any)
+const AuthenticatedEscalaCultoIdRoute =
+  AuthenticatedEscalaCultoIdRouteImport.update({
+    id: '/$cultoId',
+    path: '/$cultoId',
+    getParentRoute: () => AuthenticatedEscalaRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/culto': typeof AuthenticatedCultoRoute
-  '/escala': typeof AuthenticatedEscalaRoute
+  '/escala': typeof AuthenticatedEscalaRouteWithChildren
   '/perfil': typeof AuthenticatedPerfilRoute
   '/repertorio': typeof AuthenticatedRepertorioRoute
+  '/escala/$cultoId': typeof AuthenticatedEscalaCultoIdRoute
+  '/escala/novo': typeof AuthenticatedEscalaNovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/culto': typeof AuthenticatedCultoRoute
-  '/escala': typeof AuthenticatedEscalaRoute
+  '/escala': typeof AuthenticatedEscalaRouteWithChildren
   '/perfil': typeof AuthenticatedPerfilRoute
   '/repertorio': typeof AuthenticatedRepertorioRoute
+  '/escala/$cultoId': typeof AuthenticatedEscalaCultoIdRoute
+  '/escala/novo': typeof AuthenticatedEscalaNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,15 +91,33 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/culto': typeof AuthenticatedCultoRoute
-  '/_authenticated/escala': typeof AuthenticatedEscalaRoute
+  '/_authenticated/escala': typeof AuthenticatedEscalaRouteWithChildren
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/repertorio': typeof AuthenticatedRepertorioRoute
+  '/_authenticated/escala/$cultoId': typeof AuthenticatedEscalaCultoIdRoute
+  '/_authenticated/escala/novo': typeof AuthenticatedEscalaNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/culto' | '/escala' | '/perfil' | '/repertorio'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/culto'
+    | '/escala'
+    | '/perfil'
+    | '/repertorio'
+    | '/escala/$cultoId'
+    | '/escala/novo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/culto' | '/escala' | '/perfil' | '/repertorio'
+  to:
+    | '/'
+    | '/auth'
+    | '/culto'
+    | '/escala'
+    | '/perfil'
+    | '/repertorio'
+    | '/escala/$cultoId'
+    | '/escala/novo'
   id:
     | '__root__'
     | '/'
@@ -92,6 +127,8 @@ export interface FileRouteTypes {
     | '/_authenticated/escala'
     | '/_authenticated/perfil'
     | '/_authenticated/repertorio'
+    | '/_authenticated/escala/$cultoId'
+    | '/_authenticated/escala/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,19 +188,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCultoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/escala/novo': {
+      id: '/_authenticated/escala/novo'
+      path: '/novo'
+      fullPath: '/escala/novo'
+      preLoaderRoute: typeof AuthenticatedEscalaNovoRouteImport
+      parentRoute: typeof AuthenticatedEscalaRoute
+    }
+    '/_authenticated/escala/$cultoId': {
+      id: '/_authenticated/escala/$cultoId'
+      path: '/$cultoId'
+      fullPath: '/escala/$cultoId'
+      preLoaderRoute: typeof AuthenticatedEscalaCultoIdRouteImport
+      parentRoute: typeof AuthenticatedEscalaRoute
+    }
   }
 }
 
+interface AuthenticatedEscalaRouteChildren {
+  AuthenticatedEscalaCultoIdRoute: typeof AuthenticatedEscalaCultoIdRoute
+  AuthenticatedEscalaNovoRoute: typeof AuthenticatedEscalaNovoRoute
+}
+
+const AuthenticatedEscalaRouteChildren: AuthenticatedEscalaRouteChildren = {
+  AuthenticatedEscalaCultoIdRoute: AuthenticatedEscalaCultoIdRoute,
+  AuthenticatedEscalaNovoRoute: AuthenticatedEscalaNovoRoute,
+}
+
+const AuthenticatedEscalaRouteWithChildren =
+  AuthenticatedEscalaRoute._addFileChildren(AuthenticatedEscalaRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCultoRoute: typeof AuthenticatedCultoRoute
-  AuthenticatedEscalaRoute: typeof AuthenticatedEscalaRoute
+  AuthenticatedEscalaRoute: typeof AuthenticatedEscalaRouteWithChildren
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedRepertorioRoute: typeof AuthenticatedRepertorioRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCultoRoute: AuthenticatedCultoRoute,
-  AuthenticatedEscalaRoute: AuthenticatedEscalaRoute,
+  AuthenticatedEscalaRoute: AuthenticatedEscalaRouteWithChildren,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedRepertorioRoute: AuthenticatedRepertorioRoute,
 }
