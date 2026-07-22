@@ -14,6 +14,283 @@ export type Database = {
   }
   public: {
     Tables: {
+      cantor_tons: {
+        Row: {
+          cantor_id: string
+          created_at: string
+          id: string
+          musica_id: string
+          observacoes: string | null
+          tom: string
+          updated_at: string
+        }
+        Insert: {
+          cantor_id: string
+          created_at?: string
+          id?: string
+          musica_id: string
+          observacoes?: string | null
+          tom: string
+          updated_at?: string
+        }
+        Update: {
+          cantor_id?: string
+          created_at?: string
+          id?: string
+          musica_id?: string
+          observacoes?: string | null
+          tom?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cantor_tons_cantor_id_fkey"
+            columns: ["cantor_id"]
+            isOneToOne: false
+            referencedRelation: "cantores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cantor_tons_musica_id_fkey"
+            columns: ["musica_id"]
+            isOneToOne: false
+            referencedRelation: "musicas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cantores: {
+        Row: {
+          created_at: string
+          extensao_vocal: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          updated_at: string
+          voz: string | null
+        }
+        Insert: {
+          created_at?: string
+          extensao_vocal?: string | null
+          foto_url?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          voz?: string | null
+        }
+        Update: {
+          created_at?: string
+          extensao_vocal?: string | null
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          voz?: string | null
+        }
+        Relationships: []
+      }
+      cultos: {
+        Row: {
+          created_at: string
+          data: string
+          hora: string
+          id: string
+          local: string | null
+          nome: string
+          pregador: string | null
+          responsavel: string | null
+          tema: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          hora?: string
+          id?: string
+          local?: string | null
+          nome?: string
+          pregador?: string | null
+          responsavel?: string | null
+          tema?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          hora?: string
+          id?: string
+          local?: string | null
+          nome?: string
+          pregador?: string | null
+          responsavel?: string | null
+          tema?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      instrumentistas: {
+        Row: {
+          created_at: string
+          disponibilidade: string | null
+          foto_url: string | null
+          id: string
+          instrumento: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          disponibilidade?: string | null
+          foto_url?: string | null
+          id?: string
+          instrumento: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          disponibilidade?: string | null
+          foto_url?: string | null
+          id?: string
+          instrumento?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      integrantes_culto: {
+        Row: {
+          cantor_id: string | null
+          created_at: string
+          culto_id: string
+          funcao: string
+          id: string
+          instrumentista_id: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          cantor_id?: string | null
+          created_at?: string
+          culto_id: string
+          funcao: string
+          id?: string
+          instrumentista_id?: string | null
+          status?: string
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          cantor_id?: string | null
+          created_at?: string
+          culto_id?: string
+          funcao?: string
+          id?: string
+          instrumentista_id?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integrantes_culto_cantor_id_fkey"
+            columns: ["cantor_id"]
+            isOneToOne: false
+            referencedRelation: "cantores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integrantes_culto_culto_id_fkey"
+            columns: ["culto_id"]
+            isOneToOne: false
+            referencedRelation: "cultos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integrantes_culto_instrumentista_id_fkey"
+            columns: ["instrumentista_id"]
+            isOneToOne: false
+            referencedRelation: "instrumentistas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      musicas: {
+        Row: {
+          autor: string | null
+          bpm: number | null
+          cifra: string | null
+          compasso: string | null
+          created_at: string
+          duracao: string | null
+          id: string
+          letra: string | null
+          mapa: string | null
+          ministerio: string | null
+          multitrack_url: string | null
+          nome: string
+          observacoes: string | null
+          playback_url: string | null
+          spotify_url: string | null
+          tom_original: string | null
+          updated_at: string
+          youtube_url: string | null
+        }
+        Insert: {
+          autor?: string | null
+          bpm?: number | null
+          cifra?: string | null
+          compasso?: string | null
+          created_at?: string
+          duracao?: string | null
+          id?: string
+          letra?: string | null
+          mapa?: string | null
+          ministerio?: string | null
+          multitrack_url?: string | null
+          nome: string
+          observacoes?: string | null
+          playback_url?: string | null
+          spotify_url?: string | null
+          tom_original?: string | null
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          autor?: string | null
+          bpm?: number | null
+          cifra?: string | null
+          compasso?: string | null
+          created_at?: string
+          duracao?: string | null
+          id?: string
+          letra?: string | null
+          mapa?: string | null
+          ministerio?: string | null
+          multitrack_url?: string | null
+          nome?: string
+          observacoes?: string | null
+          playback_url?: string | null
+          spotify_url?: string | null
+          tom_original?: string | null
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -43,6 +320,64 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      repertorio_culto: {
+        Row: {
+          cantor_id: string | null
+          created_at: string
+          culto_id: string
+          id: string
+          musica_id: string
+          observacoes: string | null
+          ordem: number
+          tom_override: string | null
+          updated_at: string
+        }
+        Insert: {
+          cantor_id?: string | null
+          created_at?: string
+          culto_id: string
+          id?: string
+          musica_id: string
+          observacoes?: string | null
+          ordem?: number
+          tom_override?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cantor_id?: string | null
+          created_at?: string
+          culto_id?: string
+          id?: string
+          musica_id?: string
+          observacoes?: string | null
+          ordem?: number
+          tom_override?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repertorio_culto_cantor_id_fkey"
+            columns: ["cantor_id"]
+            isOneToOne: false
+            referencedRelation: "cantores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repertorio_culto_culto_id_fkey"
+            columns: ["culto_id"]
+            isOneToOne: false
+            referencedRelation: "cultos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repertorio_culto_musica_id_fkey"
+            columns: ["musica_id"]
+            isOneToOne: false
+            referencedRelation: "musicas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
