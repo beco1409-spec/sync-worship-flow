@@ -11,10 +11,10 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Portal Adoração — Início" },
+      { title: "Ministério de louvor" },
       { name: "description", content: "Gerencie escalas, repertório e o Modo Culto ao vivo do seu ministério de louvor." },
-      { property: "og:title", content: "Portal Adoração" },
-      { property: "og:description", content: "App premium para ministérios de louvor com Modo Culto sincronizado em tempo real." },
+      { property: "og:title", content: "Ministério de louvor" },
+      { property: "og:description", content: "Gerencie escalas, repertório e o Modo Culto ao vivo do seu ministério de louvor." },
     ],
   }),
   component: Dashboard,
