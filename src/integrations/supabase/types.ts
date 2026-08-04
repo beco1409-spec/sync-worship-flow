@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      avisos: {
+        Row: {
+          autor_id: string
+          created_at: string
+          id: string
+          mensagem: string
+        }
+        Insert: {
+          autor_id: string
+          created_at?: string
+          id?: string
+          mensagem: string
+        }
+        Update: {
+          autor_id?: string
+          created_at?: string
+          id?: string
+          mensagem?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cantor_tons: {
         Row: {
           cantor_id: string
@@ -69,6 +98,7 @@ export type Database = {
           observacoes: string | null
           telefone: string | null
           updated_at: string
+          user_id: string | null
           voz: string | null
         }
         Insert: {
@@ -80,6 +110,7 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
           voz?: string | null
         }
         Update: {
@@ -91,9 +122,93 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
           voz?: string | null
         }
         Relationships: []
+      }
+      culto_historico: {
+        Row: {
+          created_at: string
+          culto_id: string
+          encerrado_em: string
+          id: string
+          iniciado_em: string
+          total_musicas: number
+        }
+        Insert: {
+          created_at?: string
+          culto_id: string
+          encerrado_em?: string
+          id?: string
+          iniciado_em: string
+          total_musicas?: number
+        }
+        Update: {
+          created_at?: string
+          culto_id?: string
+          encerrado_em?: string
+          id?: string
+          iniciado_em?: string
+          total_musicas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "culto_historico_culto_id_fkey"
+            columns: ["culto_id"]
+            isOneToOne: false
+            referencedRelation: "cultos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      culto_live: {
+        Row: {
+          created_at: string
+          culto_id: string
+          ended_at: string | null
+          id: string
+          playing: boolean
+          repertorio_id: string | null
+          started_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          culto_id: string
+          ended_at?: string | null
+          id?: string
+          playing?: boolean
+          repertorio_id?: string | null
+          started_at?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          culto_id?: string
+          ended_at?: string | null
+          id?: string
+          playing?: boolean
+          repertorio_id?: string | null
+          started_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "culto_live_culto_id_fkey"
+            columns: ["culto_id"]
+            isOneToOne: true
+            referencedRelation: "cultos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "culto_live_repertorio_id_fkey"
+            columns: ["repertorio_id"]
+            isOneToOne: false
+            referencedRelation: "repertorio_culto"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cultos: {
         Row: {
@@ -145,6 +260,7 @@ export type Database = {
           observacoes: string | null
           telefone: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -156,6 +272,7 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -167,6 +284,7 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -224,6 +342,35 @@ export type Database = {
             columns: ["instrumentista_id"]
             isOneToOne: false
             referencedRelation: "instrumentistas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      musica_favoritos: {
+        Row: {
+          created_at: string
+          id: string
+          musica_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          musica_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          musica_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musica_favoritos_musica_id_fkey"
+            columns: ["musica_id"]
+            isOneToOne: false
+            referencedRelation: "musicas"
             referencedColumns: ["id"]
           },
         ]
@@ -298,6 +445,7 @@ export type Database = {
           funcao_vocal: string | null
           id: string
           nome_completo: string
+          notificacoes_ativas: boolean
           telefone: string | null
           updated_at: string
         }
@@ -307,6 +455,7 @@ export type Database = {
           funcao_vocal?: string | null
           id: string
           nome_completo?: string
+          notificacoes_ativas?: boolean
           telefone?: string | null
           updated_at?: string
         }
@@ -316,6 +465,7 @@ export type Database = {
           funcao_vocal?: string | null
           id?: string
           nome_completo?: string
+          notificacoes_ativas?: boolean
           telefone?: string | null
           updated_at?: string
         }
