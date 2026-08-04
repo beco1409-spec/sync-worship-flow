@@ -12,7 +12,7 @@ import {
   Star,
   Plus,
   Youtube,
-  Spotify,
+  Headphones,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
