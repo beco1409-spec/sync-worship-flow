@@ -388,7 +388,7 @@ function RepertorioPage() {
                           rel="noreferrer"
                           className="text-muted-foreground hover:text-foreground"
                         >
-                          <Spotify className="size-3.5" />
+                          <Headphones className="size-3.5" />
                         </a>
                       )}
                       {m.cifra && (
