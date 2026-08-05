@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { Download, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { createMusica, updateMusica, type Musica } from "@/lib/db";
+import { importCifraClub } from "@/lib/cifraclub.functions";
+import { isCifraClubUrl } from "@/lib/cifraclub-parser";
 
 const TONS = ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "Cm", "C#m", "Dm", "D#m", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bbm", "Bm"];
 
@@ -26,11 +28,12 @@ export function MusicaForm({
     bpm: musica?.bpm ? String(musica.bpm) : "",
     duracao: musica?.duracao ?? "",
     youtube_url: musica?.youtube_url ?? "",
-    spotify_url: musica?.spotify_url ?? "",
+    cifraclub_url: musica?.cifraclub_url ?? "",
     letra: musica?.letra ?? "",
     cifra: musica?.cifra ?? "",
     observacoes: musica?.observacoes ?? "",
   });
+  const [importing, setImporting] = useState(false);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -42,7 +45,7 @@ export function MusicaForm({
         bpm: form.bpm ? parseInt(form.bpm, 10) : null,
         duracao: form.duracao.trim() || null,
         youtube_url: form.youtube_url.trim() || null,
-        spotify_url: form.spotify_url.trim() || null,
+        cifraclub_url: form.cifraclub_url.trim() || null,
         letra: form.letra.trim() || null,
         cifra: form.cifra.trim() || null,
         observacoes: form.observacoes.trim() || null,
@@ -56,12 +59,40 @@ export function MusicaForm({
     },
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ["musicas"] });
-      toast.success(editing ? "Música atualizada" : "Música cadastrada");
+      toast.success(editing ? "Música atualizada" : "Música cadastrada com sucesso");
       onSaved?.(id);
       onClose();
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  async function handleImportar() {
+    const url = form.cifraclub_url.trim();
+    if (!isCifraClubUrl(url)) {
+      toast.error("Não foi possível importar esta música do Cifra Club.", {
+        description: "Verifique se o link é válido (ex.: https://www.cifraclub.com.br/artista/musica/).",
+      });
+      return;
+    }
+    setImporting(true);
+    try {
+      const data = await importCifraClub({ data: { url } });
+      setForm((f) => ({
+        ...f,
+        nome: data.nome ?? f.nome,
+        autor: data.autor ?? f.autor,
+        tom_original: data.tom ?? f.tom_original,
+        cifra: data.cifra ?? f.cifra,
+      }));
+      toast.success("Cifra importada do Cifra Club", {
+        description: "Revise os campos e salve a música.",
+      });
+    } catch {
+      toast.error("Não foi possível importar esta música do Cifra Club.");
+    } finally {
+      setImporting(false);
+    }
+  }
 
   const valid = form.nome.trim().length > 0 && (!form.bpm || /^\d{2,3}$/.test(form.bpm));
 
@@ -95,9 +126,32 @@ export function MusicaForm({
           }}
           className="space-y-3 px-5"
         >
+          <Field label="Link do Cifra Club">
+            <div className="flex gap-2">
+              <input
+                type="url"
+                placeholder="https://www.cifraclub.com.br/..."
+                value={form.cifraclub_url}
+                onChange={(e) => setForm({ ...form, cifraclub_url: e.target.value })}
+                className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent"
+              />
+              <button
+                type="button"
+                onClick={handleImportar}
+                disabled={importing || !form.cifraclub_url.trim()}
+                className="flex shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3 py-2.5 text-[11px] font-bold uppercase tracking-wider text-accent-foreground disabled:opacity-60"
+              >
+                {importing ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Download className="size-4" />
+                )}
+                {importing ? "Importando…" : "Importar"}
+              </button>
+            </div>
+          </Field>
           <Field label="Nome *">
             <input
-              autoFocus
               required
               value={form.nome}
               onChange={(e) => setForm({ ...form, nome: e.target.value })}
@@ -162,15 +216,6 @@ export function MusicaForm({
               className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent"
             />
           </Field>
-          <Field label="Spotify">
-            <input
-              type="url"
-              placeholder="https://open.spotify.com/…"
-              value={form.spotify_url}
-              onChange={(e) => setForm({ ...form, spotify_url: e.target.value })}
-              className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent"
-            />
-          </Field>
           <Field label="Cifra">
             <textarea
               rows={4}
@@ -209,7 +254,7 @@ export function MusicaForm({
               disabled={!valid || save.isPending}
               className="flex-1 rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
             >
-              {save.isPending ? "Salvando…" : editing ? "Salvar" : "Cadastrar"}
+              {save.isPending ? "Salvando…" : "Salvar Música"}
             </button>
           </div>
         </form>

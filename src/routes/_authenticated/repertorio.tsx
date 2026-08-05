@@ -12,7 +12,7 @@ import {
   Star,
   Plus,
   Youtube,
-  Headphones,
+  FileMusic,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -381,14 +381,14 @@ function RepertorioPage() {
                           <Youtube className="size-3.5" />
                         </a>
                       )}
-                      {m.spotify_url && (
+                      {m.cifraclub_url && (
                         <a
-                          href={m.spotify_url}
+                          href={m.cifraclub_url}
                           target="_blank"
                           rel="noreferrer"
                           className="text-muted-foreground hover:text-foreground"
                         >
-                          <Headphones className="size-3.5" />
+                          <FileMusic className="size-3.5" />
                         </a>
                       )}
                       {m.cifra && (
