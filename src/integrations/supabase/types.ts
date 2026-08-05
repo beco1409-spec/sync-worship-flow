@@ -380,6 +380,7 @@ export type Database = {
           autor: string | null
           bpm: number | null
           cifra: string | null
+          cifraclub_url: string | null
           compasso: string | null
           created_at: string
           duracao: string | null
@@ -391,7 +392,6 @@ export type Database = {
           nome: string
           observacoes: string | null
           playback_url: string | null
-          spotify_url: string | null
           tom_original: string | null
           updated_at: string
           youtube_url: string | null
@@ -400,6 +400,7 @@ export type Database = {
           autor?: string | null
           bpm?: number | null
           cifra?: string | null
+          cifraclub_url?: string | null
           compasso?: string | null
           created_at?: string
           duracao?: string | null
@@ -411,7 +412,6 @@ export type Database = {
           nome: string
           observacoes?: string | null
           playback_url?: string | null
-          spotify_url?: string | null
           tom_original?: string | null
           updated_at?: string
           youtube_url?: string | null
@@ -420,6 +420,7 @@ export type Database = {
           autor?: string | null
           bpm?: number | null
           cifra?: string | null
+          cifraclub_url?: string | null
           compasso?: string | null
           created_at?: string
           duracao?: string | null
@@ -431,7 +432,6 @@ export type Database = {
           nome?: string
           observacoes?: string | null
           playback_url?: string | null
-          spotify_url?: string | null
           tom_original?: string | null
           updated_at?: string
           youtube_url?: string | null
