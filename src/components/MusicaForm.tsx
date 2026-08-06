@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { createMusica, updateMusica, type Musica } from "@/lib/db";
 import { importCifraClub } from "@/lib/cifraclub.functions";
-import { isCifraClubUrl } from "@/lib/cifraclub-parser";
+import { normalizeCifraClubUrl } from "@/lib/cifraclub-url";
 
 const TONS = ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "Cm", "C#m", "Dm", "D#m", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bbm", "Bm"];
 
@@ -34,6 +34,29 @@ export function MusicaForm({
     observacoes: musica?.observacoes ?? "",
   });
   const [importing, setImporting] = useState(false);
+  const [importStep, setImportStep] = useState<string | null>(null);
+  const stepTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => () => stepTimers.current.forEach(clearTimeout), []);
+
+  function startImportSteps() {
+    stepTimers.current.forEach(clearTimeout);
+    stepTimers.current = [];
+    const steps: Array<[number, string]> = [
+      [0, "Validando URL…"],
+      [500, "Lendo página do Cifra Club…"],
+      [2500, "Extraindo cifra, tom e letra…"],
+    ];
+    for (const [ms, label] of steps) {
+      stepTimers.current.push(setTimeout(() => setImportStep(label), ms));
+    }
+  }
+
+  function stopImportSteps() {
+    stepTimers.current.forEach(clearTimeout);
+    stepTimers.current = [];
+    setImportStep(null);
+  }
 
   const save = useMutation({
     mutationFn: async () => {
@@ -67,30 +90,50 @@ export function MusicaForm({
   });
 
   async function handleImportar() {
-    const url = form.cifraclub_url.trim();
-    if (!isCifraClubUrl(url)) {
-      toast.error("Não foi possível importar esta música do Cifra Club.", {
-        description: "Verifique se o link é válido (ex.: https://www.cifraclub.com.br/artista/musica/).",
+    const raw = form.cifraclub_url.trim();
+    const normalizada = normalizeCifraClubUrl(raw);
+    if (!normalizada) {
+      toast.error("Link inválido do Cifra Club.", {
+        description:
+          "Cole o link de uma música, ex.: https://www.cifraclub.com.br/artista/musica/ (parâmetros como ?key=3 são aceitos).",
       });
       return;
     }
+    if (importing) return;
     setImporting(true);
+    startImportSteps();
     try {
-      const data = await importCifraClub({ data: { url } });
-      setForm((f) => ({
-        ...f,
-        nome: data.nome ?? f.nome,
-        autor: data.autor ?? f.autor,
-        tom_original: data.tom ?? f.tom_original,
-        cifra: data.cifra ?? f.cifra,
-      }));
-      toast.success("Cifra importada do Cifra Club", {
-        description: "Revise os campos e salve a música.",
+      const data = await importCifraClub({ data: { url: normalizada.canonical } });
+      setImportStep("Preenchendo formulário…");
+      setForm((f) => {
+        const notas: string[] = [];
+        if (data.capotraste && !/sem capotraste/i.test(data.capotraste)) {
+          notas.push(`Capotraste: ${data.capotraste}`);
+        }
+        if (data.afinacao && !/padr[aã]o/i.test(data.afinacao)) {
+          notas.push(`Afinação: ${data.afinacao}`);
+        }
+        return {
+          ...f,
+          cifraclub_url: normalizada.canonical,
+          nome: data.nome ?? f.nome,
+          autor: data.autor ?? f.autor,
+          tom_original: data.tom ?? f.tom_original,
+          cifra: data.cifra ?? f.cifra,
+          letra: f.letra || (data.letra ?? f.letra),
+          observacoes: f.observacoes || notas.join(" · "),
+        };
       });
-    } catch {
-      toast.error("Não foi possível importar esta música do Cifra Club.");
+      toast.success("Música importada com sucesso!", {
+        description: "Cifra, tom, artista e letra preenchidos. Revise e salve.",
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Erro inesperado ao importar.";
+      console.error("[cifraclub] falha na importação:", e);
+      toast.error("Não foi possível importar.", { description: msg });
     } finally {
       setImporting(false);
+      stopImportSteps();
     }
   }
 
@@ -149,6 +192,12 @@ export function MusicaForm({
                 {importing ? "Importando…" : "Importar"}
               </button>
             </div>
+            {importing && importStep && (
+              <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <Loader2 className="size-3 animate-spin" />
+                {importStep}
+              </p>
+            )}
           </Field>
           <Field label="Nome *">
             <input
