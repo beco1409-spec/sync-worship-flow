@@ -1,35 +1,31 @@
 import { createServerFn } from "@tanstack/react-start";
-import { isCifraClubUrl, parseCifraClubHtml, type CifraClubImport } from "./cifraclub-parser";
+import { normalizeCifraClubUrl } from "./cifraclub-url";
+import { parseCifraClubHtml, type CifraClubImport } from "./cifraclub-parser";
+import { fetchCifraClubHtml } from "./cifraclub-fetch.server";
 
 export const importCifraClub = createServerFn({ method: "POST" })
   .inputValidator((data: { url: string }) => {
-    if (!data || typeof data.url !== "string" || !isCifraClubUrl(data.url)) {
-      throw new Error("Informe um link válido do Cifra Club.");
+    const norm = data?.url ? normalizeCifraClubUrl(String(data.url)) : null;
+    if (!norm) {
+      throw new Error(
+        "Link inválido. Cole o link de uma música do Cifra Club (ex.: https://www.cifraclub.com.br/artista/musica/).",
+      );
     }
-    return { url: data.url.trim() };
+    return { url: norm.canonical };
   })
   .handler(async ({ data }): Promise<CifraClubImport> => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
-    try {
-      const res = await fetch(data.url, {
-        signal: controller.signal,
-        redirect: "follow",
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
-          Accept: "text/html,application/xhtml+xml",
-          "Accept-Language": "pt-BR,pt;q=0.9",
-        },
-      });
-      if (!res.ok) throw new Error(`Página não encontrada (HTTP ${res.status}).`);
-      const html = await res.text();
-      const parsed = parseCifraClubHtml(html);
-      if (!parsed.cifra && !parsed.nome) {
-        throw new Error("Não foi possível identificar a cifra nesta página.");
-      }
-      return parsed;
-    } finally {
-      clearTimeout(timer);
+    console.log("[cifraclub] 1/3 URL normalizada:", data.url);
+
+    const page = await fetchCifraClubHtml(data.url);
+    console.log(`[cifraclub] 2/3 página lida: HTTP ${page.status}, ${page.html.length} bytes`);
+
+    const { data: parsed, diag } = parseCifraClubHtml(page.html);
+    console.log("[cifraclub] 3/3 extração:", JSON.stringify(diag));
+
+    if (!parsed.cifra && !parsed.nome) {
+      throw new Error(
+        "A página foi carregada, mas a estrutura da cifra não foi reconhecida. Tente outra versão da música no Cifra Club.",
+      );
     }
+    return parsed;
   });
