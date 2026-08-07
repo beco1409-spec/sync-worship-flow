@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { CifraView } from "@/components/CifraView";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -25,7 +26,7 @@ import {
   startLive,
   updateLive,
 } from "@/lib/db";
-import { transposeCifra, transposeTom } from "@/lib/transpose";
+import { transposeTom } from "@/lib/transpose";
 
 export const Route = createFileRoute("/_authenticated/culto")({
   head: () => ({
@@ -387,9 +388,8 @@ function ModoCultoPage() {
           </div>
         </div>
 
-        <pre className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-foreground">
-          {transposeCifra(conteudo, offset)}
-        </pre>
+        {/* Cifra renderizada pelo Parser de Cifras — transposição sempre a partir do original */}
+        <CifraView text={conteudo} semitones={offset} />
 
         <div className="mt-6 rounded-2xl border border-border bg-surface p-4">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
