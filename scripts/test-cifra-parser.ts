@@ -135,7 +135,7 @@ const ESPERADO_MAIS2 = [
   "Jesus eu preciso de Ti",
   "",
   "[Refrão]",
-  "A              D/F#       Esus4",
+  "A              D/F#        Esus4",
   "Amor, Graça e Aleluia!",
   "A  Deus eu exalto, Espírito",
   "Em todo tempo, Senhor e Cristo",
@@ -162,7 +162,7 @@ for (let s = -11; s <= 11; s++) {
 
 // Acentos, pontuação e caracteres especiais da letra nunca mudam
 const acentos = "Coração, canção, alegria — até o pó: ééé!";
-eq(transposeCifraText(`C  G\n${acentos}`, 6), `D  A\n${acentos}`, "acentos e pontuação intactos");
+eq(transposeCifraText(`C  G\n${acentos}`, 6), `F#  C#\n${acentos}`, "acentos e pontuação intactos");
 
 // ─────────────────────────────────────────────────────────────
 // 6. 20 TROCAS SEGUIDAS — SEMPRE A PARTIR DO ORIGINAL
