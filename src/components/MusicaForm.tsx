@@ -290,7 +290,8 @@ export function MusicaForm({
             />
           </Field>
 
-          <div className="flex gap-2 pt-2">
+          {/* Rodapé fixo: Salvar Música permanece sempre visível durante a rolagem */}
+          <div className="sticky bottom-0 z-10 -mx-5 flex gap-2 border-t border-border/60 bg-background px-5 pb-1 pt-3">
             <button
               type="button"
               onClick={onClose}
