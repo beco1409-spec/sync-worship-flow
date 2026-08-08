@@ -235,6 +235,19 @@ export async function listMusicas() {
   return data ?? [];
 }
 
+/** Releitura de confirmação: garante que o registro existe mesmo no banco. */
+export async function getMusica(id: string) {
+  const { data, error } = await supabase
+    .from("musicas")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+
+
 export async function createMusica(input: MusicaInsert) {
   const { data, error } = await supabase.from("musicas").insert(input).select("*").single();
   if (error) throw error;

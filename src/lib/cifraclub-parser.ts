@@ -5,6 +5,8 @@
  * Cada campo tem fallbacks e o resultado inclui diagnósticos (`diag`)
  * indicando qual estratégia funcionou — usado nos logs do backend.
  */
+import { parseCifra } from "./cifra-parser";
+
 
 export interface CifraClubImport {
   nome: string | null;
@@ -185,37 +187,15 @@ function extractCifra(html: string): { cifra: string | null; fonte: string | nul
   return { cifra: null, fonte: null };
 }
 
-// Token que parece acorde: G, Am7, D/F#, Bb(9), C#m7(11), E°…
-const CHORD_TOKEN =
-  /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add|no|°|ø|\+|-)?[0-9]*(?:sus[24]?|add[0-9]+)?(?:\([0-9#b+,°ø\s-]*\))?(?:\/[A-G][#b]?(?:m|maj|min|dim|aug|sus|add|no|°|ø|\+|-)?[0-9]*)*$/;
-// Anotações que não são letra: "(Frase)", "(2x)", "4x", "%", "…"
-const NOTACAO_TOKEN = /^[\d()\[\].,;:%xX…*+\-]+$/;
-// Marcadores de seção: "[Intro]", "[Primeira Parte]"
-const SECTION_TOKEN = /^\[[^\]]*\]$/;
-// Anotações entre parênteses com texto: "(Frase)", "(Solo)"
-const PAREN_TOKEN = /^\([^)]*\)$/;
-
-function isChordOnlyLine(line: string): boolean {
-  const tokens = line.trim().split(/\s+/).filter(Boolean);
-  if (tokens.length === 0) return false;
-  // Linha só de marcadores de seção é estrutura da música — preservar na letra.
-  if (tokens.every((t) => SECTION_TOKEN.test(t))) return false;
-  // Linha onde todo o resto é acorde/anotação (ex.: "[Intro] (Frase) G D/F#") — descartar.
-  return tokens.every(
-    (t) =>
-      CHORD_TOKEN.test(t) ||
-      NOTACAO_TOKEN.test(t) ||
-      SECTION_TOKEN.test(t) ||
-      PAREN_TOKEN.test(t),
-  );
-}
-
-/** Deriva a letra da cifra removendo linhas que são só acordes/notações. */
+/**
+ * Deriva a letra usando o MESMO motor estrutural do app (`cifra-parser`),
+ * sem regex duplicada. Linhas classificadas como "acordes" (inclui casos
+ * como `F7M(2)/C`) são removidas; títulos `[Seção]` e letra permanecem.
+ */
 function deriveLetra(cifra: string): string | null {
-  const linhas = cifra
-    .split("\n")
-    .map((l) => (isChordOnlyLine(l) ? "" : l.replace(/\s+$/g, "")));
-  const letra = linhas
+  const parsed = parseCifra(cifra);
+  const letra = parsed.lines
+    .map((l) => (l.type === "acordes" ? "" : l.raw.replace(/\s+$/g, "")))
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();

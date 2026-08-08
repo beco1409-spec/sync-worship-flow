@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, CalendarDays, Music2, User, Play } from "lucide-react";
+import { useOverlayOpen } from "@/lib/overlay-store";
 
 type NavItem = {
   to: "/" | "/escala" | "/culto" | "/repertorio" | "/perfil";
@@ -18,6 +19,10 @@ const items: NavItem[] = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const overlayOpen = useOverlayOpen();
+
+  // Formulário em tela cheia aberto: o rodapé sai da árvore por completo.
+  if (overlayOpen) return null;
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-surface/85 backdrop-blur-xl">
