@@ -5,6 +5,8 @@
  * Cada campo tem fallbacks e o resultado inclui diagnósticos (`diag`)
  * indicando qual estratégia funcionou — usado nos logs do backend.
  */
+import { parseCifra } from "./cifra-parser";
+
 
 export interface CifraClubImport {
   nome: string | null;
