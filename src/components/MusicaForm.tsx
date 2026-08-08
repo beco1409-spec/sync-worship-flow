@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { createMusica, updateMusica, type Musica } from "@/lib/db";
+import { createMusica, updateMusica, getMusica, type Musica } from "@/lib/db";
 import { importCifraClub } from "@/lib/cifraclub.functions";
 import { normalizeCifraClubUrl } from "@/lib/cifraclub-url";
+import { useOverlayLock } from "@/lib/overlay-store";
 
 const TONS = ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "Cm", "C#m", "Dm", "D#m", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bbm", "Bm"];
 
