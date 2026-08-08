@@ -20,6 +20,8 @@ export function MusicaForm({
 }) {
   const qc = useQueryClient();
   const editing = !!musica;
+  // Enquanto o formulário estiver aberto, o rodapé de navegação some.
+  useOverlayLock();
 
   const [form, setForm] = useState({
     nome: musica?.nome ?? "",
@@ -74,20 +76,35 @@ export function MusicaForm({
         cifra: form.cifra.trim() || null,
         observacoes: form.observacoes.trim() || null,
       };
+      let id: string;
       if (editing) {
         await updateMusica(musica!.id, payload);
-        return musica!.id;
+        id = musica!.id;
+      } else {
+        const row = await createMusica(payload);
+        id = row.id;
       }
-      const row = await createMusica(payload);
-      return row.id;
+      // Confirmação de persistência: relê o registro direto do banco.
+      const salvo = await getMusica(id);
+      if (!salvo) throw new Error("O registro não foi encontrado no banco após o salvamento.");
+      if (salvo.nome !== payload.nome) {
+        throw new Error("Os dados não persistiram corretamente no banco.");
+      }
+      return id;
     },
-    onSuccess: (id) => {
-      qc.invalidateQueries({ queryKey: ["musicas"] });
-      toast.success(editing ? "Música atualizada" : "Música cadastrada com sucesso");
+    onSuccess: async (id) => {
+      await qc.invalidateQueries({ queryKey: ["musicas"] });
+      toast.success("Música salva com sucesso!");
       onSaved?.(id);
       onClose();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: unknown) => {
+      console.error("[musicas] falha ao salvar:", e);
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error("Não foi possível salvar a música. Tente novamente.", {
+        description: msg,
+      });
+    },
   });
 
   async function handleImportar() {
@@ -142,11 +159,11 @@ export function MusicaForm({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-background pb-8 pt-4 shadow-elegant"
+        className="flex max-h-[92dvh] w-full max-w-md flex-col overflow-y-auto overscroll-contain rounded-t-3xl bg-background pt-4 shadow-elegant"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
@@ -292,7 +309,7 @@ export function MusicaForm({
           </Field>
 
           {/* Rodapé fixo: Salvar Música permanece sempre visível durante a rolagem */}
-          <div className="sticky bottom-0 z-10 -mx-5 flex gap-2 border-t border-border/60 bg-background px-5 pb-1 pt-3">
+          <div className="sticky bottom-0 z-10 -mx-5 mt-2 flex gap-2 border-t border-border/60 bg-background px-5 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
             <button
               type="button"
               onClick={onClose}
@@ -303,9 +320,10 @@ export function MusicaForm({
             <button
               type="submit"
               disabled={!valid || save.isPending}
+              aria-busy={save.isPending}
               className="flex-1 rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
             >
-              {save.isPending ? "Salvando…" : "Salvar Música"}
+              {save.isPending ? "Salvando música…" : "Salvar Música"}
             </button>
           </div>
         </form>
