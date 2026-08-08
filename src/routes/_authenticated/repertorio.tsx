@@ -409,6 +409,7 @@ function RepertorioPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">
                     <button
+                      aria-label={fav ? `Desfavoritar ${m.nome}` : `Favoritar ${m.nome}`}
                       onClick={() => toggleFavorito.mutate({ musicaId: m.id, fav })}
                       className={`grid size-7 place-items-center rounded-full ${
                         fav ? "text-accent" : "text-muted-foreground"
@@ -417,6 +418,7 @@ function RepertorioPage() {
                       <Star className="size-4" fill={fav ? "currentColor" : "none"} />
                     </button>
                     <button
+                      aria-label={`Editar ${m.nome}`}
                       onClick={() => {
                         setEditing(m);
                         setFormOpen(true);
@@ -426,6 +428,7 @@ function RepertorioPage() {
                       <Pencil className="size-3.5" />
                     </button>
                     <button
+                      aria-label={`Excluir ${m.nome}`}
                       onClick={() => {
                         if (confirm(`Excluir "${m.nome}" da biblioteca?`)) {
                           excluirMusica.mutate(m.id);
